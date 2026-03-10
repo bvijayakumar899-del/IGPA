@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Logged Out - Investor Guide{% endblock %}
+
+{% block head %}
+<style>
+    .logout-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+    }
+    .logout-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+    }
+    .logout-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 40px 30px;
+    }
+    .logout-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+    .logout-title {
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    .logout-subtitle {
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    .logout-body {
+        padding: 40px;
+    }
+    .logout-message {
+        font-size: 1.2rem;
+        color: #64748b;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        border: none;
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        display: inline-block;
+        text-decoration: none;
+    }
+    .btn-primary-custom:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        color: white;
+    }
+    .btn-outline-custom {
+        background: transparent;
+        border: 2px solid var(--primary-color);
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-decoration: none;
+        margin-left: 15px;
+    }
+    .btn-outline-custom:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+    .features {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        gap: 20px;
+    }
+    .feature {
+        text-align: center;
+        max-width: 150px;
+    }
+    .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .feature-text {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    .footer {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 30px 0;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="logout-container">
+    <div class="logout-card">
+        <div class="logout-header">
+            <div class="logout-icon">
+                <i class="bi bi-box-arrow-right"></i>
+            </div>
+            <h2 class="logout-title">Successfully Logged Out</h2>
+            <p class="logout-subtitle">Thank you for using our platform</p>
+        </div>
+        <div class="logout-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <p class="logout-message">
+                You have been successfully logged out of your account. 
+                We hope you found our stock analysis tools helpful for your investment decisions.
+            </p>
+            
+            <div>
+                <a href="{{ url_for('index') }}" class="btn-primary-custom">
+                    <i class="bi bi-house-door me-2"></i>Return to Home
+                </a>
+                <a href="{{ url_for('login') }}" class="btn-outline-custom">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Login Again
+                </a>
+            </div>
+            
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <div class="feature-text">Price Analysis</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <div class="feature-text">AI Predictions</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="bi bi-newspaper"></i>
+                    </div>
+                    <div class="feature-text">Market News</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

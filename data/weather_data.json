@@ -1,0 +1,12 @@
+{
+  "users": {
+    "bvijayakumar899@gmail.com": {
+      "id": "1755460285",
+      "username": "bvijayakumar899@gmail.com",
+      "email": "bvijayakumar899@gmail.com",
+      "password": "scrypt:32768:8:1$hmiSpI69hNvxESGS$cbec3af1a02fc7a119d7dcf6dcc14696b1ea997bd18d36def871a9efe643fb9d5eeaad2e6f8ab84171eca2634091d022c4ad963628d51d01f3709df0157995a1",
+      "created_at": "2025-08-18T01:21:25.593176"
+    }
+  },
+  "search_history": []
+}

@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service - Investor Guide{% endblock %}
+
+{% block head %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #4361ee 0%, #3f37c9 50%, #5e60ce 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(67, 97, 238, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .dashboard-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        animation: pulse 15s infinite linear;
+    }
+    @keyframes pulse {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .dashboard-header h1 {
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 5px;
+        position: relative;
+        z-index: 1;
+    }
+    .dashboard-header p {
+        opacity: 0.9;
+        font-weight: 300;
+        position: relative;
+        z-index: 1;
+    }
+    .card {
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 24px;
+        border: none;
+        overflow: hidden;
+        transition: var(--transition);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+    .dark-mode-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 50px;
+        padding: 8px 15px;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+    .dark-mode-toggle:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    body.dark-mode {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #e2e8f0;
+    }
+    body.dark-mode .card {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+        color: #e2e8f0;
+    }
+    .footer {
+        background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+        color: white;
+        padding: 30px 0;
+        margin-top: 50px;
+    }
+    .footer a {
+        color: white;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    .footer a:hover {
+        color: #4cc9f0;
+    }
+    .terms-section {
+        margin-bottom: 30px;
+    }
+    .terms-section h3 {
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    .terms-section p {
+        line-height: 1.8;
+        margin-bottom: 15px;
+    }
+    .terms-section ul {
+        padding-left: 20px;
+    }
+    .terms-section li {
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+    .highlight {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        border: none;
+        padding: 12px 24px;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+    }
+    .last-updated {
+        font-style: italic;
+        color: #64748b;
+        margin-bottom: 20px;
+    }
+    body.dark-mode .last-updated {
+        color: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-12 text-center">
+                <h1><i class="bi bi-file-text me-2"></i>Terms of Service</h1>
+                <p>Please read these terms carefully before using our services</p>
+            </div>
+        </div>
+        <button class="dark-mode-toggle" id="darkModeToggle">
+            <i class="bi bi-moon-fill"></i> Dark Mode
+        </button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card p-4">
+        <p class="last-updated">Last updated: January 1, 2025</p>
+        
+        <div class="terms-section">
+            <h3>1. Acceptance of Terms</h3>
+            <p>Welcome to Investor Guide. These Terms of Service ("Terms") govern your use of our website, services, and applications (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use the Service.</p>
+            <p>Investor Guide reserves the right to update and change the Terms from time to time without notice. Any new features that augment or enhance the current Service, including the release of new tools and resources, shall be subject to the Terms. Continued use of the Service after any such changes shall constitute your consent to such changes.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>2. Description of Service</h3>
+            <p>Investor Guide is a financial analysis platform that provides users with real-time stock data, financial statements, news analysis, and AI-powered predictions. The Service is designed to help investors make informed decisions by providing comprehensive market insights and analytical tools.</p>
+            <p>Our Service includes, but is not limited to:</p>
+            <ul>
+                <li>Real-time stock price tracking and historical data</li>
+                <li>Financial statement analysis and reporting</li>
+                <li>News sentiment analysis</li>
+                <li>AI-powered stock price predictions</li>
+                <li>Portfolio tracking and analysis tools</li>
+                <li>Educational resources and market insights</li>
+            </ul>
+        </div>
+        
+        <div class="terms-section">
+            <h3>3. User Accounts</h3>
+            <p>To access certain features of the Service, you may be required to create an account. You agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate, current, and complete.</p>
+            <p>You are responsible for safeguarding the password that you use to access the Service and for any activities or actions under your password. You agree not to disclose your password to any third party. You must notify us immediately upon becoming aware of any breach of security or unauthorized use of your account.</p>
+            <p>Investor Guide reserves the right to terminate accounts that are inactive for an extended period or that violate these Terms.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>4. User Conduct</h3>
+            <p>You agree to use the Service only for lawful purposes and in accordance with these Terms. You agree not to use the Service:</p>
+            <ul>
+                <li>In any way that violates any applicable federal, state, local, or international law or regulation</li>
+                <li>To transmit or procure the sending of any advertising or promotional material, including any "junk mail," "chain letter," "spam," or any other similar solicitation</li>
+                <li>To impersonate or attempt to impersonate Investor Guide, a Investor Guide employee, another user, or any other person or entity</li>
+                <li>To engage in any automated use of the system, such as using scripts to send comments or messages, or using any data mining, robots, or similar data gathering and extraction tools</li>
+                <li>To interfere with or disrupt the Service or servers or networks connected to the Service</li>
+                <li>To upload or transmit viruses or any other type of malicious code that will or may be used in any way that will affect the functionality or operation of the Service</li>
+            </ul>
+        </div>
+        
+        <div class="terms-section">
+            <h3>5. Intellectual Property Rights</h3>
+            <p>Unless otherwise indicated, the Service and all content, features, and functionality on the Service are owned by Investor Guide, its licensors, or other providers of such material and are protected by copyright, trademark, trade secret, and other intellectual property or proprietary rights laws.</p>
+            <p>These Terms do not grant you any right, title, or interest in the Service, other than the limited right to use the Service in accordance with these Terms. All rights not expressly granted herein are reserved by Investor Guide.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>6. Disclaimers</h3>
+            <p>The Service is provided on an as-is and as-available basis. Investor Guide expressly disclaims all warranties of any kind, whether express or implied, including, but not limited to, the implied warranties of merchantability, fitness for a particular purpose, and non-infringement.</p>
+            <p>Investor Guide makes no warranties or representations about the accuracy or completeness of the Service's content or the content of any websites linked to the Service and assumes no liability or responsibility for any (1) errors, mistakes, or inaccuracies of content and materials, (2) personal injury or property damage, of any nature whatsoever, resulting from your access to and use of the Service, (3) any unauthorized access to or use of our secure servers and/or any and all personal information and/or financial information stored therein.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>7. Limitation of Liability</h3>
+            <p>In no event shall Investor Guide, its directors, employees, partners, agents, suppliers, or affiliates, be liable for any injury, loss, claim, or any direct, indirect, incidental, punitive, special, or consequential damages of any kind, including, without limitation, lost profits, lost revenue, loss of data, replacement costs, or any similar damages, whether based in contract, tort (including negligence), strict liability or otherwise, arising from your use of the Service or any procurement by you of any products or services from any third party vendor linked to the Service.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>8. Indemnification</h3>
+            <p>You agree to indemnify and hold Investor Guide and its parents, subsidiaries, affiliates, officers, employees, agents, partners, and licensors harmless from any claim or demand, including reasonable attorneys' fees, made by any third party due to or arising out of your breach of these Terms or your violation of any law or the rights of a third party.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>9. Privacy Policy</h3>
+            <p>Your use of the Service is also governed by our Privacy Policy, which is incorporated into these Terms by this reference. Our Privacy Policy describes how we collect, use, and protect your personal information when you use our Service.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>10. Termination</h3>
+            <p>We may terminate or suspend your account and bar access to the Service immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever and without limitation, including but not limited to a breach of the Terms.</p>
+            <p>Upon termination, your right to use the Service will cease immediately. If you wish to terminate your account, you may simply discontinue using the Service.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>11. Governing Law</h3>
+            <p>These Terms shall be governed and construed in accordance with the laws of India, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>12. Changes to Terms</h3>
+            <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.</p>
+            <p>By continuing to access or use our Service after those revisions become effective, you agree to be bound by the revised terms. If you do not agree to the new terms, please stop using the Service.</p>
+        </div>
+        
+        <div class="terms-section">
+            <h3>13. Contact Us</h3>
+            <p>If you have any questions about these Terms, please contact us at:</p>
+            <p><span class="highlight">By email:</span> terms@investorguide.com</p>
+            <p><span class="highlight">By mail:</span> Legal Department, Investor Guide, 123 Financial District, Suite 100, Mumbai, Maharashtra 400001, India</p>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="bi bi-house me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i> Light Mode';
+        }
+        
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+                darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i> Light Mode';
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+                darkModeToggle.innerHTML = '<i class="bi bi-moon-fill"></i> Dark Mode';
+            }
+        });
+    });
+</script>
+{% endblock %}

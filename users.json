@@ -1,0 +1,26 @@
+{
+    "admin": {
+        "email": "admin@example.com",
+        "password": "scrypt:32768:8:1$2zCFD7xnYNejjE7J$ffc7b9089f1ad5ba0d7e47b034dea4789a1f02063473f1ce85487a9392429e7ab5e73accd2efa1b9eefda87b16421e314f42fb9106ed0b291f3e8243c058799b",
+        "created_at": "2025-08-15 10:01:29",
+        "display_name": "Admin"
+    },
+    "bvijayakumar899@gmail.com": {
+        "email": "bvijayakumar899@gmail.com",
+        "password": "scrypt:32768:8:1$79L2ucLnbfHElf2T$3adfa5ee8a3f6bcf593bdd51746967c11b8d65ca74d20cf54ae2adc9e297aa3b7d0235c9f6cd6bd6af81a881e2f808b290c223a3075ae38b74943a5821b9c588",
+        "created_at": "2025-08-15 10:03:23",
+        "display_name": "bvijayakumar899@gmail.com"
+    },
+    "bvijayakumar8991@gmail.com": {
+        "email": "bvijayakumar8991@gmail.com",
+        "password": "pbkdf2:sha256:260000$EoO60LWj9ybK1gWv$52377e1141e95cd6b306f73f0f53838c8da690d92c45699d39c2b72ff5bfed20",
+        "created_at": "2025-11-20 10:58:33",
+        "display_name": "bvijayakumar8991@gmail.com"
+    },
+    "ashwinicachar@gmail.com": {
+        "email": "ashwinicachar@gmail.com",
+        "password": "pbkdf2:sha256:260000$dc1VzaYFZC4AY53O$20f461c7195cf38ce6eda109e18c8ee59d3601928ad0dd774a1e3a1b3174c560",
+        "created_at": "2026-03-10 10:26:29",
+        "display_name": "ashwinicachar@gmail.com"
+    }
+}

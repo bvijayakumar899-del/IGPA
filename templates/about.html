@@ -1,0 +1,516 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - Investor Guide{% endblock %}
+
+{% block head %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #4361ee 0%, #3f37c9 50%, #5e60ce 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(67, 97, 238, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    .dashboard-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        animation: pulse 15s infinite linear;
+    }
+    @keyframes pulse {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .dashboard-header h1 {
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 5px;
+        position: relative;
+        z-index: 1;
+    }
+    .dashboard-header p {
+        opacity: 0.9;
+        font-weight: 300;
+        position: relative;
+        z-index: 1;
+    }
+    .card {
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 24px;
+        border: none;
+        overflow: hidden;
+        transition: var(--transition);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+    .dark-mode-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 50px;
+        padding: 8px 15px;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+    .dark-mode-toggle:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    body.dark-mode {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #e2e8f0;
+    }
+    body.dark-mode .card {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+        color: #e2e8f0;
+    }
+    .footer {
+        background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+        color: white;
+        padding: 30px 0;
+        margin-top: 50px;
+    }
+    .footer a {
+        color: white;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    .footer a:hover {
+        color: #4cc9f0;
+    }
+    .about-section {
+        margin-bottom: 40px;
+    }
+    .about-section h2 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+    .about-section p {
+        line-height: 1.8;
+        margin-bottom: 15px;
+    }
+    .about-section ul {
+        padding-left: 20px;
+    }
+    .about-section li {
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+    .team-member {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .team-member img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 4px solid var(--primary-color);
+    }
+    .team-member h4 {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .team-member p {
+        color: #64748b;
+        margin-bottom: 10px;
+    }
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    .social-link {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    .social-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+    }
+    .milestone {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .milestone-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+    }
+    .milestone-text {
+        font-size: 1.1rem;
+        color: #64748b;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        border: none;
+        padding: 12px 24px;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+    }
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 2px;
+        height: 100%;
+        background: var(--primary-color);
+        transform: translateX(-50%);
+    }
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        transform: translateX(-50%);
+    }
+    .timeline-content {
+        position: relative;
+        width: 45%;
+        padding: 15px;
+        border-radius: 8px;
+        background: white;
+        box-shadow: var(--card-shadow);
+    }
+    .timeline-item:nth-child(odd) .timeline-content {
+        margin-left: auto;
+    }
+    .timeline-date {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+    }
+    .timeline-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .timeline-description {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    body.dark-mode .timeline-content {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+    }
+    body.dark-mode .timeline-description {
+        color: #94a3b8;
+    }
+    .value-card {
+        text-align: center;
+        padding: 25px;
+        height: 100%;
+    }
+    .value-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .value-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+    }
+    .value-description {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+    body.dark-mode .value-description {
+        color: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-12 text-center">
+                <h1><i class="bi bi-building me-2"></i>About Us</h1>
+                <p>Empowering investors with data-driven insights since 2018</p>
+            </div>
+        </div>
+        <button class="dark-mode-toggle" id="darkModeToggle">
+            <i class="bi bi-moon-fill"></i> Dark Mode
+        </button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card p-4 mb-4">
+        <div class="about-section">
+            <h2>Our Story</h2>
+            <p>Founded in 2018, Investor Guide emerged from a simple yet powerful idea: to democratize investment insights and make sophisticated financial analysis accessible to everyone. Our journey began when a team of financial analysts, data scientists, and software engineers came together with a shared vision of leveraging technology to level the playing field in the investment world.</p>
+            <p>What started as a small project has now grown into a comprehensive platform that serves thousands of investors across India. We combine cutting-edge AI technology with deep financial expertise to provide our users with tools and insights that were once available only to institutional investors.</p>
+            <p>Today, Investor Guide stands as a testament to the power of innovation and the relentless pursuit of excellence. We continue to evolve, adding new features and refining our algorithms to ensure our users have the most accurate and actionable information at their fingertips.</p>
+        </div>
+    </div>
+    
+    <div class="card p-4 mb-4">
+        <div class="about-section">
+            <h2>Our Mission</h2>
+            <p>Our mission is to empower individual investors with the tools, data, and insights they need to make informed investment decisions. We believe that everyone should have access to the same quality of information and analysis that institutional investors rely on.</p>
+            <p>Through our platform, we aim to:</p>
+            <ul>
+                <li>Democratize access to sophisticated financial analysis tools</li>
+                <li>Provide real-time data and AI-powered predictions</li>
+                <li>Educate investors about market dynamics and investment strategies</li>
+                <li>Foster a community of informed and confident investors</li>
+                <li>Continuously innovate to stay ahead of market trends</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="card p-4 mb-4">
+        <div class="about-section">
+            <h2>Our Values</h2>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card value-card">
+                        <div class="value-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3 class="value-title">Integrity</h3>
+                        <p class="value-description">We operate with transparency and honesty, ensuring our users can trust the information and insights we provide.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card value-card">
+                        <div class="value-icon">
+                            <i class="bi bi-lightbulb"></i>
+                        </div>
+                        <h3 class="value-title">Innovation</h3>
+                        <p class="value-description">We constantly push the boundaries of technology to deliver cutting-edge solutions for our users.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card value-card">
+                        <div class="value-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3 class="value-title">User-Centric</h3>
+                        <p class="value-description">Our users are at the heart of everything we do. We design our platform with their needs and success in mind.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card p-4 mb-4">
+        <div class="about-section">
+            <h2>Our Journey</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2018</div>
+                        <div class="timeline-title">Foundation</div>
+                        <div class="timeline-description">Investor Guide was founded with a vision to democratize investment insights.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2019</div>
+                        <div class="timeline-title">First Product Launch</div>
+                        <div class="timeline-description">Released our initial stock analysis tool with basic financial metrics.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2020</div>
+                        <div class="timeline-title">AI Integration</div>
+                        <div class="timeline-description">Introduced our first AI-powered prediction models for stock analysis.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2021</div>
+                        <div class="timeline-title">Major Expansion</div>
+                        <div class="timeline-description">Expanded our coverage to include all major Indian stock exchanges and added sentiment analysis.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2022</div>
+                        <div class="timeline-title">Mobile App Launch</div>
+                        <div class="timeline-description">Released our mobile application to provide on-the-go access to investment insights.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2023</div>
+                        <div class="timeline-title">Advanced Analytics</div>
+                        <div class="timeline-description">Launched advanced portfolio analysis and risk assessment tools.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2024</div>
+                        <div class="timeline-title">AI 2.0</div>
+                        <div class="timeline-description">Introduced next-generation AI models with improved accuracy and new prediction capabilities.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-date">2025</div>
+                        <div class="timeline-title">Global Expansion</div>
+                        <div class="timeline-description">Expanded our services to international markets and introduced multi-currency support.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card p-4 mb-4">
+        <div class="about-section">
+            <h2>Our Impact</h2>
+            <div class="row">
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="milestone">
+                        <div class="milestone-number">50K+</div>
+                        <div class="milestone-text">Active Users</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="milestone">
+                        <div class="milestone-number">5,000+</div>
+                        <div class="milestone-text">Stocks Analyzed</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="milestone">
+                        <div class="milestone-number">85%</div>
+                        <div class="milestone-text">Prediction Accuracy</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="milestone">
+                        <div class="milestone-number">4.8/5</div>
+                        <div class="milestone-text">User Rating</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card p-4 mb-4">
+        <div class="about-section">
+            <h2>Our Leadership Team</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="team-member">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="CEO">
+                        <h4>Rajesh Sharma</h4>
+                        <p>Chief Executive Officer</p>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="team-member">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="CTO">
+                        <h4>Priya Patel</h4>
+                        <p>Chief Technology Officer</p>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="team-member">
+                        <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="CFO">
+                        <h4>Amit Kumar</h4>
+                        <p>Chief Financial Officer</p>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mb-5">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="bi bi-house me-2"></i>Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i> Light Mode';
+        }
+        
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+                darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i> Light Mode';
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+                darkModeToggle.innerHTML = '<i class="bi bi-moon-fill"></i> Dark Mode';
+            }
+        });
+    });
+</script>
+{% endblock %}

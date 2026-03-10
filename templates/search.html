@@ -1,0 +1,3581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Guide - Stock Analysis Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #f72585;
+            --success-color: #4cc9f0;
+            --warning-color: #f8961e;
+            --danger-color: #f94144;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7ff 0%, #e8ebff 100%);
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+        /* Dashboard Header */
+        .dashboard-header {
+            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 50%, #5e60ce 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(67, 97, 238, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .dashboard-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: pulse 15s infinite linear;
+        }
+        @keyframes pulse {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .dashboard-header h1 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+        .dashboard-header p {
+            opacity: 0.9;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .overview-container.visible {
+            animation: slideDown 0.5s ease forwards;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Cards */
+        .card {
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            border: none;
+            overflow: hidden;
+            transition: var(--transition);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            color: white;
+            border-radius: 16px 16px 0 0 !important;
+            font-weight: 600;
+            padding: 16px 20px;
+            border: none;
+            position: relative;
+        }
+        .card-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+        }
+        /* Stock Info */
+        .stock-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(247, 37, 133, 0.05) 100%);
+            border-radius: 12px;
+        }
+        .stock-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .price-change {
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-block;
+            font-size: 1.1rem;
+        }
+        .positive {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.2) 0%, rgba(76, 201, 240, 0.1) 100%);
+            color: var(--success-color);
+        }
+        .negative {
+            background: linear-gradient(135deg, rgba(249, 65, 68, 0.2) 0%, rgba(249, 65, 68, 0.1) 100%);
+            color: var(--danger-color);
+        }
+        /* Tabs */
+        .nav-tabs {
+            border-bottom: none;
+            margin-bottom: 20px;
+        }
+        .nav-tabs .nav-link {
+            color: var(--dark-color);
+            font-weight: 500;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            padding: 12px 20px;
+            margin-right: 5px;
+            transition: var(--transition);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%);
+        }
+        .nav-tabs .nav-link:hover {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(67, 97, 238, 0.05) 100%);
+            color: var(--primary-color);
+        }
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        /* News Items */
+        .news-item {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+            transition: var(--transition);
+            position: relative;
+        }
+        .news-item:hover {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.03) 0%, rgba(247, 37, 133, 0.03) 100%);
+            padding-left: 10px;
+        }
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        .news-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+        }
+        .news-title a {
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .news-title a:hover {
+            color: var(--primary-color);
+        }
+        .news-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+        }
+        .news-meta i {
+            margin-right: 5px;
+        }
+        /* Tables */
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.03) 0%, rgba(247, 37, 133, 0.03) 100%);
+        }
+        /* Charts */
+        .chart-container1 {
+            position: relative;
+            height: 500px;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scaleX(1.5) scaleY(1.2); /* 150% wider, 120% taller */
+            transform-origin: center; 
+            clip-path: inset(60px 0px 00px 0px); /* top right bottom left */
+        }      
+        
+        .chart-container {
+            position: relative;
+            height: 500px;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scaleX(1.0) scaleY(1.2); /* 150% wider, 120% taller */
+            transform-origin: center; 
+            clip-path: inset(60px 0px 00px 0px); /* top right bottom left */
+        }
+        .chart-placeholder {
+            text-align: center;
+            color: #6c757d;
+        }
+        .chart-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 10px 15px;
+            transition: var(--transition);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+        }
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid rgba(67, 97, 238, 0.2);
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Fundamental Items */
+        .fundamental-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+        .fundamental-item:hover {
+            padding-left: 10px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.03) 0%, rgba(247, 37, 133, 0.03) 100%);
+        }
+        .fundamental-item:last-child {
+            border-bottom: none;
+        }
+        .fundamental-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .fundamental-value {
+            text-align: right;
+            font-weight: 500;
+        }
+        .fundamental-value.positive {
+            color: var(--success-color);
+        }
+        .fundamental-value.negative {
+            color: var(--danger-color);
+        }
+        /* API Status */
+        .api-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            display: none;
+            z-index: 1000;
+            font-weight: 500;
+            box-shadow: var(--card-shadow);
+            animation: slideIn 0.3s ease forwards;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .api-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #3bc9db 100%);
+        }
+        .api-error {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #ff6b6b 100%);
+        }
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        /* Error Message */
+        .error-message {
+            background: linear-gradient(135deg, rgba(249, 65, 68, 0.1) 0%, rgba(249, 65, 68, 0.05) 100%);
+            color: var(--danger-color);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+            border-left: 4px solid var(--danger-color);
+        }
+        /* Prediction Summary */
+        .prediction-summary-card {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(247, 37, 133, 0.05) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .prediction-summary-card h5 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        /* Metrics Card */
+        .metrics-card {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.05) 0%, rgba(248, 150, 30, 0.05) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .metrics-card h5 {
+            color: var(--success-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        /* Search Box */
+        .search-box {
+            position: relative;
+        }
+        .search-box .form-control {
+            padding-right: 50px;
+            border-radius: 30px;
+            border: none;
+            box-shadow: var(--card-shadow);
+        }
+        .search-box .btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stock-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .stock-price {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+        }
+        /* Loading Animation */
+        .loading-animation {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .dark-mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .form-control, 
+        body.dark-mode .form-select {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+        
+        body.dark-mode .nav-tabs .nav-link {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .nav-tabs .nav-link:hover {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.2) 0%, rgba(67, 97, 238, 0.1) 100%);
+        }
+        
+        body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+        }
+        
+        body.dark-mode .chart-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+        }
+        
+        body.dark-mode .news-item:hover {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+        }
+        
+        body.dark-mode .fundamental-item:hover {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+        }
+        
+        body.dark-mode .empty-state {
+            color: #94a3b8;
+        }
+        
+        body.dark-mode .empty-state i {
+            background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        body.dark-mode .prediction-summary-card {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+        }
+        
+        body.dark-mode .metrics-card {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.1) 0%, rgba(248, 150, 30, 0.1) 100%);
+        }
+        
+        body.dark-mode .stock-info {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+        }
+        
+        body.dark-mode .search-box .form-control {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .error-message {
+            background: linear-gradient(135deg, rgba(249, 65, 68, 0.2) 0%, rgba(249, 65, 68, 0.1) 100%);
+        }
+        
+        body.dark-mode .positive {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.2) 0%, rgba(76, 201, 240, 0.1) 100%);
+        }
+        
+        body.dark-mode .negative {
+            background: linear-gradient(135deg, rgba(249, 65, 68, 0.2) 0%, rgba(249, 65, 68, 0.1) 100%);
+        }
+        
+        /* Enhanced Stock Card */
+        .stock-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .stock-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stock-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stock-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4361ee;
+        }
+        
+        .stock-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            color: white;
+        }
+        
+        .stock-card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .stock-card-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stock-card-change.positive {
+            color: #4cc9f0;
+        }
+        
+        .stock-card-change.negative {
+            color: #f94144;
+        }
+        
+        /* Enhanced Stats Section */
+        .stats-section {
+            margin-bottom: 30px;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stats-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stats-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .stats-card-icon.primary {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(67, 97, 238, 0.05) 100%);
+            color: #4361ee;
+        }
+        
+        .stats-card-icon.success {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.1) 0%, rgba(76, 201, 240, 0.05) 100%);
+            color: #4cc9f0;
+        }
+        
+        .stats-card-icon.warning {
+            background: linear-gradient(135deg, rgba(248, 150, 30, 0.1) 0%, rgba(248, 150, 30, 0.05) 100%);
+            color: #f8961e;
+        }
+        
+        .stats-card-icon.danger {
+            background: linear-gradient(135deg, rgba(249, 65, 68, 0.1) 0%, rgba(249, 65, 68, 0.05) 100%);
+            color: #f94144;
+        }
+        
+        .stats-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+        
+        .stats-card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stats-card-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stats-card-change.positive {
+            color: #4cc9f0;
+        }
+        
+        .stats-card-change.negative {
+            color: #f94144;
+        }
+        
+        /* Enhanced Prediction Card */
+        .prediction-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        
+        body.dark-mode .prediction-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+        
+        .prediction-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .prediction-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4361ee;
+        }
+        
+        .prediction-card-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .prediction-card-badge.high {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.2) 0%, rgba(76, 201, 240, 0.1) 100%);
+            color: #4cc9f0;
+        }
+        
+        .prediction-card-badge.medium {
+            background: linear-gradient(135deg, rgba(248, 150, 30, 0.2) 0%, rgba(248, 150, 30, 0.1) 100%);
+            color: #f8961e;
+        }
+        
+        .prediction-card-badge.low {
+            background: linear-gradient(135deg, rgba(249, 65, 68, 0.2) 0%, rgba(249, 65, 68, 0.1) 100%);
+            color: #f94144;
+        }
+        
+        .prediction-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .prediction-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4361ee;
+        }
+        
+        .prediction-card-change {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .prediction-card-change.positive {
+            color: #4cc9f0;
+        }
+        
+        .prediction-card-change.negative {
+            color: #f94144;
+        }
+        
+        /* Enhanced News Card */
+        .news-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        body.dark-mode .news-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+        
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .news-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .news-card-source {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .news-card-source-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .news-card-source-name {
+            font-weight: 600;
+            color: #4361ee;
+        }
+        
+        .news-card-time {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        
+        .news-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #334155;
+        }
+        
+        body.dark-mode .news-card-title {
+            color: #e2e8f0;
+        }
+        
+        .news-card-description {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+        
+        body.dark-mode .news-card-description {
+            color: #94a3b8;
+        }
+        
+        .news-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .news-card-read-more {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4361ee;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .news-card-read-more:hover {
+            color: #3f37c9;
+        }
+        
+        .news-card-read-more i {
+            margin-left: 5px;
+        }
+        
+        .news-card-sentiment {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .news-card-sentiment.positive {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.2) 0%, rgba(76, 201, 240, 0.1) 100%);
+            color: #4cc9f0;
+        }
+        
+        .news-card-sentiment.neutral {
+            background: linear-gradient(135deg, rgba(248, 150, 30, 0.2) 0%, rgba(248, 150, 30, 0.1) 100%);
+            color: #f8961e;
+        }
+        
+        .news-card-sentiment.negative {
+            background: linear-gradient(135deg, rgba(249, 65, 68, 0.2) 0%, rgba(249, 65, 68, 0.1) 100%);
+            color: #f94144;
+        }
+        
+        /* Enhanced Financials Table */
+        .financials-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .financials-table th {
+            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .financials-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        body.dark-mode .financials-table td {
+            border-bottom: 1px solid #334155;
+        }
+        
+        .financials-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .financials-table tr:nth-child(even) {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.03) 0%, rgba(247, 37, 133, 0.03) 100%);
+        }
+        
+        body.dark-mode .financials-table tr:nth-child(even) {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+        }
+        
+        /* Enhanced Chart Controls */
+        .chart-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .chart-controls-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-controls-label {
+            font-weight: 500;
+            color: #64748b;
+        }
+        
+        body.dark-mode .chart-controls-label {
+            color: #94a3b8;
+        }
+        
+        /* Enhanced Tooltip */
+        .custom-tooltip {
+            position: absolute;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .custom-tooltip.show {
+            opacity: 1;
+        }
+        
+        /* Enhanced Loading Animation */
+        .enhanced-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .enhanced-loading-spinner {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid rgba(67, 97, 238, 0.2);
+            border-top-color: #4361ee;
+            animation: spin 1s linear infinite;
+        }
+        
+        .enhanced-loading-text {
+            margin-left: 15px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #4361ee;
+        }
+        
+        /* Enhanced Empty State */
+        .enhanced-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .enhanced-empty-state-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .enhanced-empty-state-icon i {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #4361ee 0%, #f72585 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .enhanced-empty-state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #334155;
+        }
+        
+        body.dark-mode .enhanced-empty-state-title {
+            color: #e2e8f0;
+        }
+        
+        .enhanced-empty-state-description {
+            font-size: 1rem;
+            color: #64748b;
+            max-width: 500px;
+            margin-bottom: 30px;
+        }
+        
+        body.dark-mode .enhanced-empty-state-description {
+            color: #94a3b8;
+        }
+        
+        .enhanced-empty-state-button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            color: white;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .enhanced-empty-state-button:hover {
+            background: linear-gradient(135deg, #3f37c9 0%, #4361ee 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+        }
+        
+        /* Enhanced Error State */
+        .enhanced-error-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .enhanced-error-state-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(249, 65, 68, 0.1) 0%, rgba(249, 65, 68, 0.05) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .enhanced-error-state-icon i {
+            font-size: 2.5rem;
+            color: #f94144;
+        }
+        
+        .enhanced-error-state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #334155;
+        }
+        
+        body.dark-mode .enhanced-error-state-title {
+            color: #e2e8f0;
+        }
+        
+        .enhanced-error-state-description {
+            font-size: 1rem;
+            color: #64748b;
+            max-width: 500px;
+            margin-bottom: 30px;
+        }
+        
+        body.dark-mode .enhanced-error-state-description {
+            color: #94a3b8;
+        }
+        
+        .enhanced-error-state-button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f94144 0%, #f72585 100%);
+            color: white;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .enhanced-error-state-button:hover {
+            background: linear-gradient(135deg, #f72585 0%, #f94144 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 65, 68, 0.4);
+        }
+        
+        /* Enhanced Responsive Design */
+        @media (max-width: 768px) {
+            .chart-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .chart-controls-group {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .form-control, .form-select {
+                width: 100%;
+            }
+        }
+        
+        .search-container {
+            transition: all 0.5s ease;
+        }
+        .search-container.hidden {
+            display: none;
+        }
+        .overview-container {
+            display: none;
+        }
+        .overview-container.visible {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .floating-search {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: none;
+        }
+        .floating-search.visible {
+            display: block;
+        }
+        .floating-search .btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            box-shadow: var(--hover-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .floating-search .btn:hover {
+            transform: scale(1.1);
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .section-title {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+        .section-title::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 70%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            border-radius: 3px;
+        }
+        .data-category {
+            margin-bottom: 25px;
+        }
+        .data-category-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        .data-category-title i {
+            margin-right: 10px;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .data-item {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .data-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .data-item:hover::before {
+            opacity: 1;
+        }
+        .data-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .data-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        .data-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        .data-value.positive {
+            color: var(--success-color);
+        }
+        .data-value.negative {
+            color: var(--danger-color);
+        }
+        .company-summary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .company-summary h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        .company-summary p {
+            line-height: 1.6;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .highlight-box h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        .highlight-data {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .highlight-item {
+            text-align: center;
+            padding: 10px;
+            min-width: 120px;
+        }
+        .highlight-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .highlight-label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        body.dark-mode .data-item {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+        }
+        body.dark-mode .data-label {
+            color: #94a3b8;
+        }
+        body.dark-mode .data-value {
+            color: #e2e8f0;
+        }
+        body.dark-mode .company-summary {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+        }
+        body.dark-mode .company-summary p {
+            color: #94a3b8;
+        }
+        body.dark-mode .highlight-box {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.2) 0%, rgba(247, 37, 133, 0.2) 100%);
+        }
+        body.dark-mode .highlight-label {
+            color: #94a3b8;
+        }
+        body.dark-mode .stock-info {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.1) 100%);
+        }
+        .metric-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .metric-card:hover {
+            border-left: 4px solid var(--primary-color);
+        }
+        .metric-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .trend-indicator {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 0.9rem;
+        }
+        .trend-up {
+            color: var(--success-color);
+        }
+        .trend-down {
+            color: var(--danger-color);
+        }
+        .prediction-chart {
+            height: 550px;
+            width: 90%;
+            margin: 0 auto;
+        }
+        .model-container {
+            height: 600px;
+            width: 80%;
+            margin: 0 auto;
+        }
+        
+        /* User Profile Section */
+        .user-profile {
+            position: absolute;
+            top: 20px;
+            right: 200px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 5px 15px;
+            z-index: 10;
+        }
+        
+        .user-profile i {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+        
+        .user-profile span {
+            font-weight: 500;
+        }
+        
+        body.dark-mode .user-profile {
+            background: rgba(30, 41, 59, 0.7);
+        }
+        
+        /* Market Indices */
+        .market-indices {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        body.dark-mode .market-indices {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+        }
+        .index-item {
+            text-align: center;
+            padding: 0 15px;
+        }
+        .index-name {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        .index-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .index-change {
+            font-size: 0.9rem;
+        }
+        .positive {
+            color: #10b981;
+        }
+        .negative {
+            color: #ef4444;
+        }
+        .refresh-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            margin-right: 5px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .stock-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .stock-tag {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .stock-tag:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        body.dark-mode .stock-tag {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+        }
+        body.dark-mode .stock-tag:hover {
+            background: var(--primary-color);
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+        }
+        .footer a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .footer a:hover {
+            color: #4cc9f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 id="headerTitle"><i class="bi bi-search me-2"></i>Search Stocks</h1>
+                    <p id="headerSubtitle">Find and analyze stocks with real-time data and AI-powered predictions</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="search-box" id="searchBox">
+                        <input type="text" id="stockSymbol" class="form-control" placeholder="Enter stock symbol (e.g., RELIANCE, TCS)">
+                        <button class="btn btn-primary" type="button" id="analyzeBtn">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Profile Section -->
+            <div class="user-profile">
+                <div class="dropdown">
+                    <a class="dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span id="usernameDisplay">{{ session.display_name or session.username or 'Guest User' }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                     <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="bi bi-moon-fill"></i> Dark Mode
+            </button>
+            <button class="back-button" id="backButton" style="display: none;">
+                <i class="bi bi-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="enhanced-loading">
+                <div class="enhanced-loading-spinner"></div>
+                <div class="enhanced-loading-text">Fetching stock data...</div>
+            </div>
+        </div>
+        
+        <!-- API Status Notification -->
+        <div class="api-status" id="apiStatus"></div>
+        
+        <!-- Search/Empty State -->
+        <div class="search-container" id="searchContainer">
+            <!-- Market Indices -->
+            <div class="market-indices">
+                <div class="index-item">
+                    <div class="index-name">NIFTY 50</div>
+                    <div class="index-value" id="niftyValue">--</div>
+                    <div class="index-change" id="niftyChange">--</div>
+                </div>
+                <div class="index-item">
+                    <div class="index-name">SENSEX</div>
+                    <div class="index-value" id="sensexValue">--</div>
+                    <div class="index-change" id="sensexChange">--</div>
+                </div>
+                <div>
+                    <span class="refresh-indicator"></span>
+                    <span>Live updates</span>
+                </div>
+                <div>
+                    <a href="/market-indices" class="btn btn-primary btn-sm">
+                        <i class="bi bi-bar-chart-line me-1"></i> View Details
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card fade-in">
+                <div class="card-body">
+                    <div class="enhanced-empty-state">
+                        <div class="enhanced-empty-state-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <h3 class="enhanced-empty-state-title">Enter a Stock Symbol</h3>
+                        <p class="enhanced-empty-state-description">Enter a stock symbol (e.g., RELIANCE, TCS, WIPRO) and click "Analyze" to view stock data, charts, financial and predictions.</p>
+                        <div class="mt-4">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="stats-card">
+                                        <div class="stats-card-header">
+                                            <div class="stats-card-icon primary">
+                                                <i class="bi bi-graph-up"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-title">Price Analysis</div>
+                                            </div>
+                                        </div>
+                                        <div class="stats-card-value">Historical Data</div>
+                                        <div class="stats-card-change positive">
+                                            <i class="bi bi-arrow-up-circle me-1"></i> Trends & Patterns
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="stats-card">
+                                        <div class="stats-card-header">
+                                            <div class="stats-card-icon success">
+                                                <i class="bi bi-cash-stack"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-title">Fundamentals</div>
+                                            </div>
+                                        </div>
+                                        <div class="stats-card-value">Key Metrics</div>
+                                        <div class="stats-card-change positive">
+                                            <i class="bi bi-arrow-up-circle me-1"></i> Financial Health
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="stats-card">
+                                        <div class="stats-card-header">
+                                            <div class="stats-card-icon danger">
+                                                <i class="bi bi-cpu"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-title">AI Predictions</div>
+                                            </div>
+                                        </div>
+                                        <div class="stats-card-value">Future Forecasts</div>
+                                        <div class="stats-card-change positive">
+                                            <i class="bi bi-arrow-up-circle me-1"></i> Price Predictions
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stock Overview Section -->
+        <div class="overview-container" id="overviewContainer">
+            <div class="card fade-in" id="stockOverview">
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="bi bi-building me-2"></i>Stock Overview</h3>
+                </div>
+                <div class="card-body">
+                    <div class="stock-info">
+                        <div>
+                            <h2 id="companyName">Enter a stock symbol to view company information</h2>
+                            <p id="stockSymbolDisplay">Symbol: --</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="stock-price" id="currentPrice">₹0.00</div>
+                            <div class="price-change" id="dailyChange">0.00%</div>
+                        </div>
+                    </div>
+                    
+                    <ul class="nav nav-tabs" id="stockTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                                <i class="bi bi-info-circle me-1"></i> Overview
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="price-tab" data-bs-toggle="tab" data-bs-target="#price" type="button" role="tab" aria-controls="price" aria-selected="false">
+                                <i class="bi bi-graph-up me-1"></i> Price History
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="news-tab" data-bs-toggle="tab" data-bs-target="#news" type="button" role="tab" aria-controls="news" aria-selected="false">
+                                <i class="bi bi-newspaper me-1"></i> News
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="financials-tab" data-bs-toggle="tab" data-bs-target="#financials" type="button" role="tab" aria-controls="financials" aria-selected="false">
+                                <i class="bi bi-file-earmark-text me-1"></i> Financials
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="prediction-tab" data-bs-toggle="tab" data-bs-target="#prediction" type="button" role="tab" aria-controls="prediction" aria-selected="false">
+                                <i class="bi bi-cpu me-1"></i> Price Prediction
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="stockTabsContent">
+                        <!-- Overview Tab -->
+                        <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                            <!-- Company Info Section -->
+                            <div class="data-category">
+                                <h3 class="data-category-title section-title"><i class="bi bi-building me-2"></i>Company Information</h3>
+                                <div class="data-grid">
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Sector</div>
+                                        <div class="data-value metric-value" id="dataSector">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Industry</div>
+                                        <div class="data-value metric-value" id="dataIndustry">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Website</div>
+                                        <div class="data-value metric-value" id="dataWebsite">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Company Summary -->
+                            <div class="company-summary">
+                                <h3><i class="bi bi-building me-2"></i>Company Summary</h3>
+                                <p id="companySummaryPara1">Enter a stock symbol to view company information.</p>
+                                <p id="companySummaryPara2">More detailed information will be displayed here after you enter a stock symbol.</p>
+                            </div>
+                            
+                            <!-- Key Highlights -->
+                            <div class="highlight-box">
+                                <h3><i class="bi bi-star me-2"></i>Key Highlights</h3>
+                                <div class="highlight-data">
+                                    <div class="highlight-item">
+                                        <div class="highlight-value" id="highlightMarketCap">₹ -</div>
+                                        <div class="highlight-label">Market Cap</div>
+                                    </div>
+                                    <div class="highlight-item">
+                                        <div class="highlight-value" id="highlightRevenue">₹ -</div>
+                                        <div class="highlight-label">Revenue</div>
+                                    </div>
+                                    <div class="highlight-item">
+                                        <div class="highlight-value" id="highlightNetIncome">₹ -</div>
+                                        <div class="highlight-label">Net Income</div>
+                                    </div>
+                                    <div class="highlight-item">
+                                        <div class="highlight-value" id="highlightEPS">₹ -</div>
+                                        <div class="highlight-label">EPS</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Price Performance -->
+                            <div class="data-category">
+                                <h3 class="data-category-title section-title"><i class="bi bi-graph-up-arrow me-2"></i>Price Performance</h3>
+                                <div class="data-grid">
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Current Price</div>
+                                        <div class="data-value metric-value" id="dataCurrentPrice">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Daily Change %</div>
+                                        <div class="data-value metric-value" id="dataDailyChange">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Weekly Change %</div>
+                                        <div class="data-value metric-value" id="dataWeeklyChange">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Monthly Change %</div>
+                                        <div class="data-value metric-value" id="dataMonthlyChange">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">52 Week High</div>
+                                        <div class="data-value metric-value" id="data52WeekHigh">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">52 Week Low</div>
+                                        <div class="data-value metric-value" id="data52WeekLow">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">200 Day Average</div>
+                                        <div class="data-value metric-value" id="data200DayAvg">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">50 Day Average</div>
+                                        <div class="data-value metric-value" id="data50DayAvg">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Valuation Metrics -->
+                            <div class="data-category">
+                                <h3 class="data-category-title section-title"><i class="bi bi-calculator me-2"></i>Valuation Metrics</h3>
+                                <div class="data-grid">
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">P/E Ratio</div>
+                                        <div class="data-value metric-value" id="dataPERatio">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Forward P/E</div>
+                                        <div class="data-value metric-value" id="dataForwardPE">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Price to Book</div>
+                                        <div class="data-value metric-value" id="dataPriceToBook">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">EV/EBITDA</div>
+                                        <div class="data-value metric-value" id="dataEVToEBITDA">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">PEG Ratio</div>
+                                        <div class="data-value metric-value" id="dataPEGRatio">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Dividend Yield</div>
+                                        <div class="data-value metric-value" id="dataDividendYield">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Dividend Rate</div>
+                                        <div class="data-value metric-value" id="dataDividendRate">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Beta</div>
+                                        <div class="data-value metric-value" id="dataBeta">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Financial Strength -->
+                            <div class="data-category">
+                                <h3 class="data-category-title section-title"><i class="bi bi-shield-check me-2"></i>Financial Strength</h3>
+                                <div class="data-grid">
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Total Debt</div>
+                                        <div class="data-value metric-value" id="dataTotalDebt">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Total Cash</div>
+                                        <div class="data-value metric-value" id="dataTotalCash">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Net Debt</div>
+                                        <div class="data-value metric-value" id="dataNetDebt">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Debt To Equity</div>
+                                        <div class="data-value metric-value" id="dataDebtToEquity">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Current Ratio</div>
+                                        <div class="data-value metric-value" id="dataCurrentRatio">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Book Value</div>
+                                        <div class="data-value metric-value" id="dataBookValue">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Tangible Book Value</div>
+                                        <div class="data-value metric-value" id="dataTangibleBookValue">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Free Cash Flow</div>
+                                        <div class="data-value metric-value" id="dataFreeCashFlow">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Profitability -->
+                            <div class="data-category">
+                                <h3 class="data-category-title section-title"><i class="bi bi-graph-up-arrow me-2"></i>Profitability</h3>
+                                <div class="data-grid">
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Gross Profit</div>
+                                        <div class="data-value metric-value" id="dataGrossProfit">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">EBITDA</div>
+                                        <div class="data-value metric-value" id="dataEBITDA">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Operating Margin</div>
+                                        <div class="data-value metric-value" id="dataOperatingMargin">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Profit Margin</div>
+                                        <div class="data-value metric-value" id="dataProfitMargin">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">ROE</div>
+                                        <div class="data-value metric-value" id="dataROE">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">ROA</div>
+                                        <div class="data-value metric-value" id="dataROA">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Quarterly Earnings Growth</div>
+                                        <div class="data-value metric-value" id="dataQuarterlyEarningsGrowth">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Quarterly Revenue Growth</div>
+                                        <div class="data-value metric-value" id="dataQuarterlyRevenueGrowth">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Other Metrics -->
+                            <div class="data-category">
+                                <h3 class="data-category-title section-title"><i class="bi bi-three-dots me-2"></i>Other Metrics</h3>
+                                <div class="data-grid">
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Volume</div>
+                                        <div class="data-value metric-value" id="dataVolume">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Revenue Per Share</div>
+                                        <div class="data-value metric-value" id="dataRevenuePerShare">-</div>
+                                    </div>
+                                    <div class="data-item metric-card">
+                                        <div class="data-label">Payout Ratio</div>
+                                        <div class="data-value metric-value" id="dataPayoutRatio">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Price History Tab -->
+                        <div class="tab-pane fade" id="price" role="tabpanel" aria-labelledby="price-tab">
+                            <div class="error-message" id="priceChartError">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <span>Failed to load price history data. Please try again later.</span>
+                                <button class="btn btn-sm btn-outline-danger retry-button ms-2" id="retryPriceChart">Retry</button>
+                            </div>
+                            
+                            <div class="chart-controls">
+                                <div class="chart-controls-group">
+                                    <label for="periodSelect" class="chart-controls-label">Select Period:</label>
+                                    <select class="form-select" id="periodSelect" style="width: auto;">
+                                        <option value="1d">1 Day</option>
+                                        <option value="5d">5 Days</option>
+                                        <option value="1mo">1 Month</option>
+                                        <option value="3mo">3 Months</option>
+                                        <option value="6mo">6 Months</option>
+                                        <option value="1y" selected>1 Year</option>
+                                        <option value="2y">2 Years</option>
+                                        <option value="5y">5 Years</option>
+                                        <option value="10y">10 Years</option>
+                                        <option value="ytd">Year to Date</option>
+                                        <option value="max">Max</option>
+                                    </select>
+                                </div>
+                                <div class="chart-controls-group">
+                                    <label for="chartType" class="chart-controls-label">Chart Type:</label>
+                                    <select class="form-select" id="chartType" style="width: auto;">
+                                        <option value="line">Line Chart</option>
+                                        <option value="candlestick">Candlestick Chart</option>                                    
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-container1">
+                                <div id="priceChart">
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0"><i class="bi bi-graph-down me-2"></i>Simple Moving Averages</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-container">
+                                                <div id="smaChart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Exponential Moving Averages</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-container">
+                                                <div id="emaChart">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- News Tab -->
+                        <div class="tab-pane fade" id="news" role="tabpanel" aria-labelledby="news-tab">
+                            <div id="newsContainer">
+                                <div class="enhanced-empty-state">
+                                    <div class="enhanced-empty-state-icon">
+                                        <i class="bi bi-newspaper"></i>
+                                    </div>
+                                    <h3 class="enhanced-empty-state-title">No News Data</h3>
+                                    <p class="enhanced-empty-state-description">Enter a stock symbol to view the latest news related to that company.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Financials Tab -->
+                        <div class="tab-pane fade" id="financials" role="tabpanel" aria-labelledby="financials-tab">
+                            <ul class="nav nav-tabs" id="financialsTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="annual-tab" data-bs-toggle="tab" data-bs-target="#annual" type="button" role="tab" aria-controls="annual" aria-selected="true">
+                                        <i class="bi bi-calendar3 me-1"></i> Annual
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="quarterly-tab" data-bs-toggle="tab" data-bs-target="#quarterly" type="button" role="tab" aria-controls="quarterly" aria-selected="false">
+                                        <i class="bi bi-calendar-range me-1"></i> Quarterly
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content" id="financialsTabsContent">
+                                <div class="tab-pane fade show active" id="annual" role="tabpanel" aria-labelledby="annual-tab">
+                                    <ul class="nav nav-tabs" id="annualTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="annual-income-tab" data-bs-toggle="tab" data-bs-target="#annual-income" type="button" role="tab" aria-controls="annual-income" aria-selected="true">
+                                                <i class="bi bi-cash-stack me-1"></i> Income Statement
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="annual-balance-tab" data-bs-toggle="tab" data-bs-target="#annual-balance" type="button" role="tab" aria-controls="annual-balance" aria-selected="false">
+                                                <i class="bi bi-balance-scale me-1"></i> Balance Sheet
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="annual-cashflow-tab" data-bs-toggle="tab" data-bs-target="#annual-cashflow" type="button" role="tab" aria-controls="annual-cashflow" aria-selected="false">
+                                                <i class="bi bi-arrow-left-right me-1"></i> Cash Flow
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    
+                                    <div class="tab-content" id="annualTabsContent">
+                                        <div class="tab-pane fade show active" id="annual-income" role="tabpanel" aria-labelledby="annual-income-tab">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="annualIncomeTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Metric</th>
+                                                            <th>2023</th>
+                                                            <th>2022</th>
+                                                            <th>2021</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="4" class="text-center">No data available</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="annual-balance" role="tabpanel" aria-labelledby="annual-balance-tab">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="annualBalanceTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Metric</th>
+                                                            <th>2023</th>
+                                                            <th>2022</th>
+                                                            <th>2021</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="4" class="text-center">No data available</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="annual-cashflow" role="tabpanel" aria-labelledby="annual-cashflow-tab">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="annualCashflowTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Metric</th>
+                                                            <th>2023</th>
+                                                            <th>2022</th>
+                                                            <th>2021</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="4" class="text-center">No data available</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-pane fade" id="quarterly" role="tabpanel" aria-labelledby="quarterly-tab">
+                                    <ul class="nav nav-tabs" id="quarterlyTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="quarterly-income-tab" data-bs-toggle="tab" data-bs-target="#quarterly-income" type="button" role="tab" aria-controls="quarterly-income" aria-selected="true">
+                                                <i class="bi bi-cash-stack me-1"></i> Income Statement
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="quarterly-balance-tab" data-bs-toggle="tab" data-bs-target="#quarterly-balance" type="button" role="tab" aria-controls="quarterly-balance" aria-selected="false">
+                                                <i class="bi bi-balance-scale me-1"></i> Balance Sheet
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="quarterly-cashflow-tab" data-bs-toggle="tab" data-bs-target="#quarterly-cashflow" type="button" role="tab" aria-controls="quarterly-cashflow" aria-selected="false">
+                                                <i class="bi bi-arrow-left-right me-1"></i> Cash Flow
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    
+                                    <div class="tab-content" id="quarterlyTabsContent">
+                                        <div class="tab-pane fade show active" id="quarterly-income" role="tabpanel" aria-labelledby="quarterly-income-tab">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="quarterlyIncomeTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Metric</th>
+                                                            <th>Q4 2023</th>
+                                                            <th>Q3 2023</th>
+                                                            <th>Q2 2023</th>
+                                                            <th>Q1 2023</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="5" class="text-center">No data available</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="quarterly-balance" role="tabpanel" aria-labelledby="quarterly-balance-tab">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="quarterlyBalanceTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Metric</th>
+                                                            <th>Q4 2023</th>
+                                                            <th>Q3 2023</th>
+                                                            <th>Q2 2023</th>
+                                                            <th>Q1 2023</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="5" class="text-center">No data available</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="quarterly-cashflow" role="tabpanel" aria-labelledby="quarterly-cashflow-tab">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="quarterlyCashflowTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Metric</th>
+                                                            <th>Q4 2023</th>
+                                                            <th>Q3 2023</th>
+                                                            <th>Q2 2023</th>
+                                                            <th>Q1 2023</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="5" class="text-center">No data available</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Prediction Tab -->
+                        <div class="tab-pane fade" id="prediction" role="tabpanel" aria-labelledby="prediction-tab">
+                            <div class="error-message" id="predictionChartError">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <span>Failed to load prediction data. Please try again later.</span>
+                                <button class="btn btn-sm btn-outline-danger retry-button ms-2" id="retryPredictionChart">Retry</button>
+                            </div>
+                            
+                            <ul class="nav nav-tabs" id="predictionModelsTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="lstm-tab" data-bs-toggle="tab" data-bs-target="#lstm-model" type="button" role="tab" aria-controls="lstm-model" aria-selected="true">
+                                        <i class="bi bi-cpu me-1"></i> LSTM Model
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="ann-tab" data-bs-toggle="tab" data-bs-target="#ann-model" type="button" role="tab" aria-controls="ann-model" aria-selected="false">
+                                        <i class="bi bi-cpu me-1"></i> ANN Model
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="svm-tab" data-bs-toggle="tab" data-bs-target="#svm-model" type="button" role="tab" aria-controls="svm-model" aria-selected="false">
+                                        <i class="bi bi-cpu me-1"></i> SVM Model
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="dt-tab" data-bs-toggle="tab" data-bs-target="#dt-model" type="button" role="tab" aria-controls="dt-model" aria-selected="false">
+                                        <i class="bi bi-cpu me-1"></i> Decision Tree Model
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="rf-tab" data-bs-toggle="tab" data-bs-target="#rf-model" type="button" role="tab" aria-controls="rf-model" aria-selected="false">
+                                        <i class="bi bi-cpu me-1"></i> Random Forest Model
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content" id="predictionModelsContent">
+                                <!-- LSTM Model -->
+                                <div class="tab-pane fade show active" id="lstm-model" role="tabpanel" aria-labelledby="lstm-tab">
+                                    <div class="model-container">
+                                        <div id="lstmPredictionChart">
+                                            <div class="chart-placeholder">
+                                                <i class="bi bi-cpu"></i>
+                                                <h4>Enter a stock symbol to view LSTM predictions</h4>
+                                                <p>LSTM model predictions will appear here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
+                                            <div class="metrics-card">
+                                                <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>LSTM Model Performance Metrics</h5>
+                                                <div id="lstmModelMetrics">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-speedometer2"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Model Metrics</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view LSTM model performance metrics.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="prediction-summary-card">
+                                                <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>LSTM Prediction Summary</h5>
+                                                <div id="lstmPredictionSummary">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-graph-up-arrow"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Prediction Summary</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view LSTM prediction summary.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- ANN Model -->
+                                <div class="tab-pane fade" id="ann-model" role="tabpanel" aria-labelledby="ann-tab">
+                                    <div class="model-container">
+                                        <div id="annPredictionChart">
+                                            <div class="chart-placeholder">
+                                                <i class="bi bi-cpu"></i>
+                                                <h4>Enter a stock symbol to view ANN predictions</h4>
+                                                <p>ANN model predictions will appear here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
+                                            <div class="metrics-card">
+                                                <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>ANN Model Performance Metrics</h5>
+                                                <div id="annModelMetrics">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-speedometer2"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Model Metrics</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view ANN model performance metrics.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="prediction-summary-card">
+                                                <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>ANN Prediction Summary</h5>
+                                                <div id="annPredictionSummary">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-graph-up-arrow"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Prediction Summary</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view ANN prediction summary.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- SVM Model -->
+                                <div class="tab-pane fade" id="svm-model" role="tabpanel" aria-labelledby="svm-tab">
+                                    <div class="model-container">
+                                        <div id="svmPredictionChart">
+                                            <div class="chart-placeholder">
+                                                <i class="bi bi-cpu"></i>
+                                                <h4>Enter a stock symbol to view SVM predictions</h4>
+                                                <p>SVM model predictions will appear here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
+                                            <div class="metrics-card">
+                                                <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>SVM Model Performance Metrics</h5>
+                                                <div id="svmModelMetrics">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-speedometer2"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Model Metrics</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view SVM model performance metrics.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="prediction-summary-card">
+                                                <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>SVM Prediction Summary</h5>
+                                                <div id="svmPredictionSummary">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-graph-up-arrow"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Prediction Summary</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view SVM prediction summary.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Decision Tree Model -->
+                                <div class="tab-pane fade" id="dt-model" role="tabpanel" aria-labelledby="dt-tab">
+                                    <div class="model-container">
+                                        <div id="dtPredictionChart">
+                                            <div class="chart-placeholder">
+                                                <i class="bi bi-cpu"></i>
+                                                <h4>Enter a stock symbol to view Decision Tree predictions</h4>
+                                                <p>Decision Tree model predictions will appear here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
+                                            <div class="metrics-card">
+                                                <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Decision Tree Model Performance Metrics</h5>
+                                                <div id="dtModelMetrics">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-speedometer2"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Model Metrics</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view Decision Tree model performance metrics.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="prediction-summary-card">
+                                                <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Decision Tree Prediction Summary</h5>
+                                                <div id="dtPredictionSummary">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-graph-up-arrow"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Prediction Summary</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view Decision Tree prediction summary.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Random Forest Model -->
+                                <div class="tab-pane fade" id="rf-model" role="tabpanel" aria-labelledby="rf-tab">
+                                    <div class="model-container">
+                                        <div id="rfPredictionChart">
+                                            <div class="chart-placeholder">
+                                                <i class="bi bi-cpu"></i>
+                                                <h4>Enter a stock symbol to view Random Forest predictions</h4>
+                                                <p>Random Forest model predictions will appear here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
+                                            <div class="metrics-card">
+                                                <h5 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Random Forest Model Performance Metrics</h5>
+                                                <div id="rfModelMetrics">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-speedometer2"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Model Metrics</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view Random Forest model performance metrics.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="prediction-summary-card">
+                                                <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Random Forest Prediction Summary</h5>
+                                                <div id="rfPredictionSummary">
+                                                    <div class="enhanced-empty-state">
+                                                        <div class="enhanced-empty-state-icon">
+                                                            <i class="bi bi-graph-up-arrow"></i>
+                                                        </div>
+                                                        <h3 class="enhanced-empty-state-title">No Prediction Summary</h3>
+                                                        <p class="enhanced-empty-state-description">Enter a stock symbol to view Random Forest prediction summary.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Search Button -->
+    <div class="floating-search" id="floatingSearch">
+        <button class="btn" id="floatingSearchBtn">
+            <i class="bi bi-search"></i>
+        </button>
+    </div>
+     
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Investor Guide</h5>
+                    <p>Empowering investors with data-driven insights</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 Investor Guide Dashboard. All rights reserved.</p>
+                    <p class="mb-0">
+                        <a href="/copyright" class="mx-2">Privacy Policy</a>
+                        <a href="/terms" class="mx-2">Terms of Service</a>
+                        <a href="/contact" class="mx-2">Contact Us</a>
+                        <a href="/about" class="mx-2">About Us</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dark mode toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            
+            // Check for saved dark mode preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i> Light Mode';
+            }
+            
+            darkModeToggle.addEventListener('click', function() {
+                body.classList.toggle('dark-mode');
+                
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                    darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i> Light Mode';
+                } else {
+                    localStorage.setItem('darkMode', 'disabled');
+                    darkModeToggle.innerHTML = '<i class="bi bi-moon-fill"></i> Dark Mode';
+                }
+            });
+            
+            // Back button
+            document.getElementById('backButton').addEventListener('click', function() {
+                showSearchContainer();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Floating search button
+            document.getElementById('floatingSearchBtn').addEventListener('click', function() {
+                showSearchContainer();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Event listeners
+            document.getElementById('analyzeBtn').addEventListener('click', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                if (symbol) {
+                    analyzeStock(symbol);
+                } else {
+                    showApiStatus('Please enter a stock symbol', false);
+                }
+            });
+            
+            document.getElementById('stockSymbol').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const symbol = this.value.trim();
+                    if (symbol) {
+                        analyzeStock(symbol);
+                    } else {
+                        showApiStatus('Please enter a stock symbol', false);
+                    }
+                }
+            });
+            
+            document.getElementById('periodSelect').addEventListener('change', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                const period = this.value;
+                if (symbol) {
+                    updatePriceChart(symbol, period);
+                }
+            });
+            
+            document.getElementById('chartType').addEventListener('change', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                const period = document.getElementById('periodSelect').value;
+                const chartType = this.value;
+                if (symbol) {
+                    updatePriceChart(symbol, period, chartType);
+                }
+            });
+            
+            // Add event listeners for prediction model tabs
+            document.getElementById('lstm-tab').addEventListener('shown.bs.tab', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                if (symbol) {
+                    updatePredictionChart(symbol, 'lstm');
+                }
+            });
+            
+            document.getElementById('ann-tab').addEventListener('shown.bs.tab', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                if (symbol) {
+                    updatePredictionChart(symbol, 'ann');
+                }
+            });
+            
+            document.getElementById('svm-tab').addEventListener('shown.bs.tab', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                if (symbol) {
+                    updatePredictionChart(symbol, 'svm');
+                }
+            });
+            
+            document.getElementById('dt-tab').addEventListener('shown.bs.tab', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                if (symbol) {
+                    updatePredictionChart(symbol, 'dt');
+                }
+            });
+            
+            document.getElementById('rf-tab').addEventListener('shown.bs.tab', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                if (symbol) {
+                    updatePredictionChart(symbol, 'rf');
+                }
+            });
+            
+            // Retry buttons
+            document.getElementById('retryPriceChart').addEventListener('click', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                const period = document.getElementById('periodSelect').value;
+                if (symbol) {
+                    updatePriceChart(symbol, period);
+                }
+            });
+            
+            document.getElementById('retryPredictionChart').addEventListener('click', function() {
+                const symbol = document.getElementById('stockSymbol').value.trim();
+                // Get the active model tab
+                const activeTab = document.querySelector('#predictionModelsTabs .nav-link.active');
+                const model = activeTab.id.replace('-tab', '');
+                if (symbol) {
+                    updatePredictionChart(symbol, model);
+                }
+            });
+            
+            // Function to update market indices
+            function updateMarketIndices() {
+                fetch('/api/market-indices')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update Nifty data
+                        const niftyValue = document.getElementById('niftyValue');
+                        const niftyChange = document.getElementById('niftyChange');
+                        
+                        niftyValue.textContent = data.nifty.current_value.toFixed(2);
+                        
+                        const niftyChangeValue = data.nifty.change;
+                        const niftyChangePercent = data.nifty.change_percent;
+                        
+                        if (niftyChangeValue > 0) {
+                            niftyChange.className = 'index-change positive';
+                            niftyChange.innerHTML = `<i class="bi bi-arrow-up"></i> ${niftyChangeValue.toFixed(2)} (${niftyChangePercent.toFixed(2)}%)`;
+                        } else if (niftyChangeValue < 0) {
+                            niftyChange.className = 'index-change negative';
+                            niftyChange.innerHTML = `<i class="bi bi-arrow-down"></i> ${Math.abs(niftyChangeValue).toFixed(2)} (${Math.abs(niftyChangePercent).toFixed(2)}%)`;
+                        } else {
+                            niftyChange.className = 'index-change neutral';
+                            niftyChange.textContent = `0.00 (0.00%)`;
+                        }
+                        
+                        // Update Sensex data
+                        const sensexValue = document.getElementById('sensexValue');
+                        const sensexChange = document.getElementById('sensexChange');
+                        
+                        sensexValue.textContent = data.sensex.current_value.toFixed(2);
+                        
+                        const sensexChangeValue = data.sensex.change;
+                        const sensexChangePercent = data.sensex.change_percent;
+                        
+                        if (sensexChangeValue > 0) {
+                            sensexChange.className = 'index-change positive';
+                            sensexChange.innerHTML = `<i class="bi bi-arrow-up"></i> ${sensexChangeValue.toFixed(2)} (${sensexChangePercent.toFixed(2)}%)`;
+                        } else if (sensexChangeValue < 0) {
+                            sensexChange.className = 'index-change negative';
+                            sensexChange.innerHTML = `<i class="bi bi-arrow-down"></i> ${Math.abs(sensexChangeValue).toFixed(2)} (${Math.abs(sensexChangePercent).toFixed(2)}%)`;
+                        } else {
+                            sensexChange.className = 'index-change neutral';
+                            sensexChange.textContent = `0.00 (0.00%)`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching market indices:', error);
+                    });
+            }
+            
+            // Initial update
+            updateMarketIndices();
+            
+            // Set up auto-refresh every 5 seconds
+            setInterval(updateMarketIndices, 5000);
+        });
+        
+        // Function to search for a stock
+        function searchStock(symbol) {
+            document.getElementById('stockSymbol').value = symbol;
+            analyzeStock(symbol);
+        }
+        
+        // API Base URL
+        const API_BASE_URL = 'http://localhost:5000/api';
+        
+        // Function to show API status notifications
+        function showApiStatus(message, isSuccess) {
+            const statusEl = document.getElementById('apiStatus');
+            statusEl.textContent = message;
+            statusEl.className = 'api-status ' + (isSuccess ? 'api-success' : 'api-error');
+            statusEl.style.display = 'block';
+            
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Function to fetch data from API
+        async function fetchFromAPI(endpoint, params = {}) {
+            try {
+                const url = new URL(`${API_BASE_URL}${endpoint}`);
+                Object.keys(params).forEach(key => {
+                    if (params[key] !== undefined && params[key] !== null) {
+                        url.searchParams.append(key, params[key]);
+                    }
+                });
+                
+                const response = await fetch(url.toString());
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API fetch error:', error);
+                showApiStatus(`Error: ${error.message}`, false);
+                throw error;
+            }
+        }
+        
+        // Function to format large numbers
+        function formatNumber(num) {
+            if (num === null || num === undefined || isNaN(num) || num === 'N/A') {
+                return 'N/A';
+            }
+            
+            const absNum = Math.abs(num);
+            
+            if (absNum >= 10000000) { // Crore
+                return (num / 10000000).toFixed(2) + ' Cr';
+            } else if (absNum >= 100000) { // Lakh
+                return (num / 100000).toFixed(2) + ' L';
+            } else if (absNum >= 1000) { // Thousand
+                return (num / 1000).toFixed(2) + ' K';
+            } else {
+                return num.toFixed(2);
+            }
+        }
+        
+        // Function to format percentage
+        function formatPercentage(num) {
+            if (num === null || num === undefined || isNaN(num) || num === 'N/A') {
+                return 'N/A';
+            }
+            
+            return num.toFixed(2) + '%';
+        }
+        
+        // Function to format currency
+        function formatCurrency(num) {
+            if (num === null || num === undefined || isNaN(num) || num === 'N/A') {
+                return 'N/A';
+            }
+            
+            return '₹' + num.toFixed(2);
+        }
+        
+        // Function to show search container
+        function showSearchContainer() {
+            document.getElementById('searchContainer').classList.remove('hidden');
+            document.getElementById('overviewContainer').classList.remove('visible');
+            document.getElementById('floatingSearch').classList.remove('visible');
+            document.getElementById('backButton').style.display = 'none';
+            document.getElementById('searchBox').style.display = 'block';
+            document.getElementById('headerTitle').innerHTML = '<i class="bi bi-search me-2"></i>Search Stocks';
+            document.getElementById('headerSubtitle').textContent = 'Find and analyze stocks with real-time data and AI-powered predictions';
+        }
+        
+        // Function to show overview container
+        function showOverviewContainer() {
+            document.getElementById('searchContainer').classList.add('hidden');
+            document.getElementById('overviewContainer').classList.add('visible');
+            document.getElementById('floatingSearch').classList.add('visible');
+            document.getElementById('backButton').style.display = 'block';
+            document.getElementById('searchBox').style.display = 'none';
+            
+            const companyName = document.getElementById('companyName').textContent;
+            document.getElementById('headerTitle').innerHTML = `<i class="bi bi-building me-2"></i>${companyName} Stock Overview`;
+            document.getElementById('headerSubtitle').textContent = 'Comprehensive financial metrics and company information';
+            
+            // Scroll to top of the page when showing overview
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Function to analyze stock
+        async function analyzeStock(symbol) {
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            // Hide any error messages
+            document.getElementById('priceChartError').style.display = 'none';
+            document.getElementById('predictionChartError').style.display = 'none';
+            
+            try {
+                // Fetch all necessary data in parallel
+                const [stockData, newsData, financialsData] = await Promise.all([
+                    fetchFromAPI(`/stock/${symbol}`),
+                    fetchFromAPI(`/news/${symbol}`),
+                    fetchFromAPI(`/financials/${symbol}`)
+                ]);
+                
+                // Update UI with fetched data
+                updateStockOverview(stockData);
+                updateNews(newsData);
+                updateFinancials(financialsData);
+                
+                // Try to update price chart, but don't fail the whole process if it fails
+                try {
+                    await updatePriceChart(symbol, '1y');
+                } catch (priceError) {
+                    console.error('Error updating price chart:', priceError);
+                    document.getElementById('priceChartError').style.display = 'block';
+                }
+                
+                // Try to update moving averages charts, but don't fail the whole process if it fails
+                try {
+                    await updateMovingAveragesCharts(symbol);
+                } catch (maError) {
+                    console.error('Error updating moving averages charts:', maError);
+                }
+                
+                // Try to update prediction chart for LSTM model (default), but don't fail the whole process if it fails
+                try {
+                    await updatePredictionChart(symbol, 'lstm');
+                } catch (predictionError) {
+                    console.error('Error updating prediction chart:', predictionError);
+                    document.getElementById('predictionChartError').style.display = 'block';
+                }
+                
+                // Show success notification
+                showApiStatus('Data loaded successfully', true);
+                
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+                
+                // Show overview container
+                showOverviewContainer();
+                
+                // Add fade-in animation
+                document.getElementById('stockOverview').classList.add('fade-in');
+            } catch (error) {
+                console.error('Error analyzing stock:', error);
+                showApiStatus('Failed to load stock data', false);
+                
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+        
+        // Function to update stock overview
+        function updateStockOverview(data) {
+            document.getElementById('companyName').textContent = data.companyName || 'N/A';
+            document.getElementById('stockSymbolDisplay').textContent = data.symbol || 'N/A';
+            document.getElementById('currentPrice').textContent = formatCurrency(data.currentPrice || 0);
+            
+            const dailyChangeEl = document.getElementById('dailyChange');
+            const dailyChange = data.dailyChange || 0;
+            dailyChangeEl.textContent = `${dailyChange >= 0 ? '+' : ''}${formatPercentage(dailyChange)}`;
+            dailyChangeEl.className = `price-change ${dailyChange >= 0 ? 'positive' : 'negative'}`;
+            
+            // Update company summary - split into two paragraphs
+            const summary = data.summary || 'No summary available.';
+            
+            // Split the summary into two paragraphs if it's long enough
+            if (summary.length > 300) {
+                // Find a good split point (after the first 300 characters, then at the next period or end of sentence)
+                let splitIndex = summary.indexOf('.', 300);
+                if (splitIndex === -1) {
+                    splitIndex = summary.indexOf('!', 300);
+                }
+                if (splitIndex === -1) {
+                    splitIndex = summary.indexOf('?', 300);
+                }
+                if (splitIndex === -1) {
+                    splitIndex = 300;
+                }
+                
+                const firstParagraph = summary.substring(0, splitIndex + 1).trim();
+                const secondParagraph = summary.substring(splitIndex + 1).trim();
+                
+                document.getElementById('companySummaryPara1').textContent = firstParagraph;
+                document.getElementById('companySummaryPara2').textContent = secondParagraph;
+            } else {
+                document.getElementById('companySummaryPara1').textContent = summary;
+                document.getElementById('companySummaryPara2').textContent = '';
+            }
+            
+            // Update key highlights
+            document.getElementById('highlightMarketCap').textContent = "₹" + formatNumber(data.marketCap || 0);
+            document.getElementById('highlightRevenue').textContent   = "₹" + formatNumber(data.revenue || 0);
+            document.getElementById('highlightNetIncome').textContent = "₹" + formatNumber(data.netIncome || 0);
+            document.getElementById('highlightEPS').textContent       = "₹" + formatNumber(data.eps || 0);
+            // Update price performance
+            document.getElementById('dataCurrentPrice').textContent = formatCurrency(data.currentPrice || 0);
+            
+            const dailyChangeDataEl = document.getElementById('dataDailyChange');
+            dailyChangeDataEl.textContent = `${dailyChange >= 0 ? '+' : ''}${formatPercentage(dailyChange)}`;
+            dailyChangeDataEl.className = `data-value ${dailyChange >= 0 ? 'positive' : 'negative'}`;
+            
+            const weeklyChangeEl = document.getElementById('dataWeeklyChange');
+            const weeklyChange = data.weeklyChange || 0;
+            weeklyChangeEl.textContent = `${weeklyChange >= 0 ? '+' : ''}${formatPercentage(weeklyChange)}`;
+            weeklyChangeEl.className = `data-value ${weeklyChange >= 0 ? 'positive' : 'negative'}`;
+            
+            const monthlyChangeEl = document.getElementById('dataMonthlyChange');
+            const monthlyChange = data.monthlyChange || 0;
+            monthlyChangeEl.textContent = `${monthlyChange >= 0 ? '+' : ''}${formatPercentage(monthlyChange)}`;
+            monthlyChangeEl.className = `data-value ${monthlyChange >= 0 ? 'positive' : 'negative'}`;
+            
+            document.getElementById('data52WeekHigh').textContent = formatCurrency(data.week52High || 0);
+            document.getElementById('data52WeekLow').textContent = formatCurrency(data.week52Low || 0);
+            document.getElementById('data200DayAvg').textContent = formatCurrency(data.day200MovingAvg || 0);
+            document.getElementById('data50DayAvg').textContent = formatCurrency(data.day50MovingAvg || 0);
+            
+            // Update valuation metrics
+            document.getElementById('dataPERatio').textContent = data.peRatio ? Number(data.peRatio).toFixed(2) : 'N/A';
+            document.getElementById('dataForwardPE').textContent = data.forwardPE ? Number(data.forwardPE).toFixed(2) : 'N/A';
+            document.getElementById('dataPriceToBook').textContent = data.priceToBook ? Number(data.priceToBook).toFixed(2) : 'N/A';
+            document.getElementById('dataEVToEBITDA').textContent = data.enterpriseToEbitda ? Number(data.enterpriseToEbitda).toFixed(2) : 'N/A';
+            document.getElementById('dataPEGRatio').textContent = data.pegRatio ? Number(data.pegRatio).toFixed(2) : 'N/A';
+            document.getElementById('dataDividendYield').textContent = data.dividendYield ? (Number(data.dividendYield) * 100).toFixed(2) + "%" : 'N/A';
+            document.getElementById('dataDividendRate').textContent = data.dividendRate ? Number(data.dividendRate).toFixed(2) : 'N/A';
+            document.getElementById('dataBeta').textContent = data.beta ? Number(data.beta).toFixed(2) : 'N/A';
+            // Update financial strength
+            document.getElementById('dataTotalDebt').textContent = formatNumber(data.totalDebt || 0);
+            document.getElementById('dataTotalCash').textContent = formatNumber(data.totalCash || 0);
+            document.getElementById('dataNetDebt').textContent = formatNumber(data.netDebt || 0);
+            document.getElementById('dataDebtToEquity').textContent = data.debtToEquity || 'N/A';
+            document.getElementById('dataCurrentRatio').textContent = data.currentRatio || 'N/A';
+            document.getElementById('dataBookValue').textContent = formatCurrency(data.bookValue || 0);
+            document.getElementById('dataTangibleBookValue').textContent = formatNumber(data.tangibleBookValue || 0);
+            document.getElementById('dataFreeCashFlow').textContent = formatNumber(data.freeCashflow || 0);
+            
+            // Update profitability
+            document.getElementById('dataGrossProfit').textContent = formatNumber(data.grossProfits || 0);
+            document.getElementById('dataEBITDA').textContent = formatNumber(data.ebitda || 0);
+            document.getElementById('dataOperatingMargin').textContent = formatPercentage(data.operatingMargin || 0);
+            document.getElementById('dataProfitMargin').textContent = formatPercentage(data.profitMargin || 0);
+            document.getElementById('dataROE').textContent = formatPercentage(data.roe || 0);
+            document.getElementById('dataROA').textContent = formatPercentage(data.roa || 0);
+            document.getElementById('dataQuarterlyEarningsGrowth').textContent = formatPercentage(data.quarterlyEarningsGrowth || 0);
+            document.getElementById('dataQuarterlyRevenueGrowth').textContent = formatPercentage(data.quarterlyRevenueGrowth || 0);
+            
+            // Update other metrics
+            document.getElementById('dataVolume').textContent = formatNumber(data.avgVolume || 0);
+            document.getElementById('dataRevenuePerShare').textContent = formatCurrency(data.revenuePerShare || 0);
+            document.getElementById('dataPayoutRatio').textContent = formatPercentage(data.payoutRatio || 0);
+            document.getElementById('dataSector').textContent = data.sector || 'N/A';
+            document.getElementById('dataIndustry').textContent = data.industry || 'N/A';
+            
+            const websiteEl = document.getElementById('dataWebsite');
+            const website = data.website || 'N/A';
+            if (website && website !== 'N/A') {
+                websiteEl.innerHTML = `<a href="${website}" target="_blank">Visit Website</a>`;
+            } else {
+                websiteEl.textContent = 'N/A';
+            }
+        }
+        
+        // Function to update news
+        function updateNews(data) {
+            const newsContainer = document.getElementById('newsContainer');
+            
+            if (!data || !data.articles || data.articles.length === 0) {
+                newsContainer.innerHTML = '<div class="enhanced-empty-state"><div class="enhanced-empty-state-icon"><i class="bi bi-newspaper"></i></div><h3 class="enhanced-empty-state-title">No News Found</h3><p class="enhanced-empty-state-description">No news articles found for this stock.</p></div>';
+                return;
+            }
+            
+            let newsHTML = '';
+            data.articles.forEach(article => {
+                const publishDate = new Date(article.published);
+                const formattedDate = publishDate.toLocaleDateString() + ' ' + publishDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                // Determine sentiment based on title (simple heuristic)
+                let sentiment = 'neutral';
+                if (article.title.toLowerCase().includes('rise') || 
+                    article.title.toLowerCase().includes('gain') || 
+                    article.title.toLowerCase().includes('positive') || 
+                    article.title.toLowerCase().includes('growth')) {
+                    sentiment = 'positive';
+                } else if (article.title.toLowerCase().includes('fall') || 
+                          article.title.toLowerCase().includes('loss') || 
+                          article.title.toLowerCase().includes('negative') || 
+                          article.title.toLowerCase().includes('decline')) {
+                    sentiment = 'negative';
+                }
+                
+                newsHTML += `
+                    <div class="news-card">
+                        <div class="news-card-header">
+                            <div>
+                                <div class="news-card-source">
+                                    <div class="news-card-source-icon">${article.publisher.charAt(0)}</div>
+                                    <div class="news-card-source-name">${article.publisher}</div>
+                                </div>
+                                <div class="news-card-time">${formattedDate}</div>
+                            </div>
+                            <div class="news-card-sentiment ${sentiment}">${sentiment.charAt(0).toUpperCase() + sentiment.slice(1)}</div>
+                        </div>
+                        <h3 class="news-card-title">${article.title}</h3>
+                        <p class="news-card-description">${article.summary || 'No summary available.'}</p>
+                        <div class="news-card-footer">
+                            <a href="${article.link}" target="_blank" class="news-card-read-more">Read More <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            newsContainer.innerHTML = newsHTML;
+        }
+        
+        // Function to update financials
+        function updateFinancials(data) {
+            // Annual Income Statement
+            if (data.annualIncome) {
+                generateTable('annualIncomeTable', data.annualIncome);
+            }
+            
+            // Annual Balance Sheet
+            if (data.annualBalance) {
+                generateTable('annualBalanceTable', data.annualBalance);
+            }
+            
+            // Annual Cash Flow
+            if (data.annualCashflow) {
+                generateTable('annualCashflowTable', data.annualCashflow);
+            }
+            
+            // Quarterly Income Statement
+            if (data.quarterlyIncome) {
+                generateTable('quarterlyIncomeTable', data.quarterlyIncome);
+            }
+            
+            // Quarterly Balance Sheet
+            if (data.quarterlyBalance) {
+                generateTable('quarterlyBalanceTable', data.quarterlyBalance);
+            }
+            
+            // Quarterly Cash Flow
+            if (data.quarterlyCashflow) {
+                generateTable('quarterlyCashflowTable', data.quarterlyCashflow);
+            }
+        }
+        
+        // Function to generate table from data
+        function generateTable(tableId, data) {
+            const table = document.getElementById(tableId);
+            if (!table || !data || !data.headers || !data.rows) {
+                return;
+            }
+            
+            let html = '<thead><tr>';
+            
+            // Headers
+            data.headers.forEach(header => {
+                html += `<th>${header}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            // Rows
+            data.rows.forEach(row => {
+                html += '<tr>';
+                row.forEach(cell => {
+                    html += `<td>${cell}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        // Function to update price chart
+        async function updatePriceChart(symbol, period, chartType = 'line') {
+            try {
+                document.getElementById('priceChartError').style.display = 'none';
+                
+                const priceData = await fetchFromAPI(`/price-history/${symbol}`, { period });
+                
+                if (!priceData || !priceData.dates || !priceData.prices) {
+                    console.error('Invalid price data received');
+                    document.getElementById('priceChartError').style.display = 'block';
+                    return;
+                }
+                
+                const dates = priceData.dates;
+                const prices = priceData.prices;
+                
+                // Create chart based on type
+                let trace;
+                if (chartType === 'candlestick' && priceData.ohlc) {
+                    trace = {
+                        x: dates,
+                        open: priceData.ohlc.open,
+                        high: priceData.ohlc.high,
+                        low: priceData.ohlc.low,
+                        close: priceData.ohlc.close,
+                        type: 'candlestick',
+                        name: symbol,
+                        increasing: {line: {color: '#4cc9f0'}},
+                        decreasing: {line: {color: '#f72585'}}
+                    };
+                } else if (chartType === 'ohlc' && priceData.ohlc) {
+                    trace = {
+                        x: dates,
+                        open: priceData.ohlc.open,
+                        high: priceData.ohlc.high,
+                        low: priceData.ohlc.low,
+                        close: priceData.ohlc.close,
+                        type: 'ohlc',
+                        name: symbol,
+                        increasing: {line: {color: '#4cc9f0'}},
+                        decreasing: {line: {color: '#f72585'}}
+                    };
+                } else {
+                    trace = {
+                        x: dates,
+                        y: prices,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: symbol,
+                        line: { color: '#4361ee', width: 2 }
+                    };
+                }
+                
+                const plotData = [trace];
+                const layout = {
+                    title: {
+                        text: `${symbol} - ${period.toUpperCase()} Price Chart`,
+                        font: { size: 18, family: 'Inter, sans-serif' }
+                    },
+                    xaxis: { 
+                        title: 'Date',
+                        gridcolor: '#e0e0e0'
+                    },
+                    yaxis: { 
+                        title: 'Price (₹)',
+                        gridcolor: '#e0e0e0'
+                    },
+                    dragmode: 'zoom',
+                    showlegend: false,
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    margin: { t: 50, r: 30, b: 50, l: 60 }
+                };
+                
+                const config = {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false,
+                    modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
+                };
+                
+                Plotly.newPlot('priceChart', plotData, layout, config);
+            } catch (error) {
+                console.error('Error updating price chart:', error);
+                document.getElementById('priceChartError').style.display = 'block';
+                throw error;
+            }
+        }
+        
+        // Function to update moving averages charts
+        async function updateMovingAveragesCharts(symbol) {
+            try {
+                const movingAveragesData = await fetchFromAPI(`/moving-averages/${symbol}`);
+                
+                if (!movingAveragesData || !movingAveragesData.dates || !movingAveragesData.close_prices) {
+                    console.error('Invalid moving averages data received');
+                    return;
+                }
+                
+                const dates = movingAveragesData.dates;
+                const closePrices = movingAveragesData.close_prices;
+                const smaData = movingAveragesData.sma;
+                const emaData = movingAveragesData.ema;
+                
+                // SMA Chart
+                const smaTraces = [
+                    {
+                        x: dates,
+                        y: closePrices,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Close Price',
+                        line: { color: '#4361ee', width: 2 }
+                    }
+                ];
+                
+                if (smaData.sma100) {
+                    smaTraces.push({
+                        x: dates.slice(smaData.sma100.offset || 0),
+                        y: smaData.sma100.values,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'SMA 100',
+                        line: { color: '#f72585', width: 2 }
+                    });
+                }
+                
+                if (smaData.sma200) {
+                    smaTraces.push({
+                        x: dates.slice(smaData.sma200.offset || 0),
+                        y: smaData.sma200.values,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'SMA 200',
+                        line: { color: '#4cc9f0', width: 2 }
+                    });
+                }
+                
+                const smaLayout = {
+                    title: {
+                        text: 'Simple Moving Averages (2025)',
+                        font: { size: 16, family: 'Inter, sans-serif' }
+                    },
+                    xaxis: { 
+                        title: 'Date',
+                        gridcolor: '#e0e0e0'
+                    },
+                    yaxis: { 
+                        title: 'Price (₹)',
+                        gridcolor: '#e0e0e0'
+                    },
+                    legend: { x: 0, y: 1 },
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    margin: { t: 50, r: 30, b: 50, l: 60 }
+                };
+                
+                const smaConfig = {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false,
+                    modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
+                };
+                
+                Plotly.newPlot('smaChart', smaTraces, smaLayout, smaConfig);
+                
+                // EMA Chart
+                const emaTraces = [
+                    {
+                        x: dates,
+                        y: closePrices,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Close Price',
+                        line: { color: '#4361ee', width: 2 }
+                    }
+                ];
+                
+                if (emaData.ema100) {
+                    emaTraces.push({
+                        x: dates.slice(emaData.ema100.offset || 0),
+                        y: emaData.ema100.values,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'EMA 100',
+                        line: { color: '#f72585', width: 2 }
+                    });
+                }
+                
+                if (emaData.ema200) {
+                    emaTraces.push({
+                        x: dates.slice(emaData.ema200.offset || 0),
+                        y: emaData.ema200.values,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'EMA 200',
+                        line: { color: '#4cc9f0', width: 2 }
+                    });
+                }
+                
+                const emaLayout = {
+                    title: {
+                        text: 'Exponential Moving Averages (2025)',
+                        font: { size: 16, family: 'Inter, sans-serif' }
+                    },
+                    xaxis: { 
+                        title: 'Date',
+                        gridcolor: '#e0e0e0'
+                    },
+                    yaxis: { 
+                        title: 'Price (₹)',
+                        gridcolor: '#e0e0e0'
+                    },
+                    legend: { x: 0, y: 1 },
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    margin: { t: 50, r: 30, b: 50, l: 60 }
+                };
+                
+                const emaConfig = {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false,
+                    modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
+                };
+                
+                Plotly.newPlot('emaChart', emaTraces, emaLayout, emaConfig);
+            } catch (error) {
+                console.error('Error updating moving averages charts:', error);
+            }
+        }
+        
+        // Function to update model metrics
+        function updateModelMetrics(metrics, modelPrefix) {
+            const modelMetrics = document.getElementById(modelPrefix + 'ModelMetrics');
+            if (!modelMetrics) return;
+            
+            modelMetrics.innerHTML = `
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-calculator me-1"></i> Mean Absolute Error</span>
+                    <span class="fundamental-value">₹${(metrics.mae || 0).toFixed(2)}</span>
+                </div>
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-calculator me-1"></i> Mean Squared Error</span>
+                    <span class="fundamental-value">${(metrics.mse || 0).toFixed(2)}</span>
+                </div>
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-calculator me-1"></i> Root Mean Squared Error</span>
+                    <span class="fundamental-value">₹${(metrics.rmse || 0).toFixed(2)}</span>
+                </div>
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-percent me-1"></i> R-squared</span>
+                    <span class="fundamental-value">${(metrics.r2 || 0).toFixed(2)}</span>
+                </div>
+            `;
+        }
+        
+        // Function to update prediction summary
+        function updatePredictionSummary(currentPrice, predictedPrice, modelPrefix) {
+            const change = predictedPrice - currentPrice;
+            const changePercent = (change / currentPrice) * 100;
+            
+            const predictionSummary = document.getElementById(modelPrefix + 'PredictionSummary');
+            if (!predictionSummary) return;
+            
+            predictionSummary.innerHTML = `
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-currency-rupee me-1"></i> Current Price</span>
+                    <span class="fundamental-value">₹${currentPrice.toFixed(2)}</span>
+                </div>
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-graph-up-arrow me-1"></i> Predicted Price (30 days)</span>
+                    <span class="fundamental-value">₹${predictedPrice.toFixed(2)}</span>
+                </div>
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-arrow-left-right me-1"></i> Predicted Change</span>
+                    <span class="fundamental-value ${change >= 0 ? 'text-success' : 'text-danger'}">
+                        ${change >= 0 ? '+' : ''}₹${change.toFixed(2)}
+                    </span>
+                </div>
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-percent me-1"></i> Predicted Change %</span>
+                    <span class="fundamental-value ${changePercent >= 0 ? 'text-success' : 'text-danger'}">
+                        ${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%
+                    </span>
+                </div>
+                <div class="fundamental-item">
+                    <span class="fundamental-label"><i class="bi bi-shield-check me-1"></i> Prediction Confidence</span>
+                    <span class="fundamental-value">85%</span>
+                </div>
+            `;
+        }
+        
+        // Function to update prediction chart
+        async function updatePredictionChart(symbol, model) {
+            try {
+                // Get the current symbol from the input field to ensure it's valid
+                const currentSymbol = document.getElementById('stockSymbol').value.trim();
+                
+                // Validate symbol
+                if (!currentSymbol || currentSymbol === "" || currentSymbol === ".NS") {
+                    console.error("Invalid stock symbol:", currentSymbol);
+                    document.getElementById('predictionChartError').style.display = 'block';
+                    document.getElementById('predictionChartError').innerHTML = 
+                        '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                        '<span>Please enter a valid stock symbol (e.g., RELIANCE.NS)</span>';
+                    return;
+                }
+                
+                // Get chart container ID based on model
+                const chartContainerId = model + 'PredictionChart';
+                
+                // Show loading indicator
+                document.getElementById(chartContainerId).innerHTML = 
+                    '<div class="enhanced-loading">' +
+                    '<div class="enhanced-loading-spinner"></div>' +
+                    '<div class="enhanced-loading-text">Training ' + model.toUpperCase() + ' model...</div>' +
+                    '</div>';
+                document.getElementById('predictionChartError').style.display = 'none';
+                
+                console.log(`Fetching prediction data for ${currentSymbol} using ${model} model`);
+                const predictionData = await fetchFromAPI(`/prediction/${currentSymbol}`, { model });
+                
+                if (!predictionData.dates || !predictionData.actualPrices) {
+                    console.error('Invalid prediction data structure');
+                    document.getElementById('predictionChartError').style.display = 'block';
+                    document.getElementById('predictionChartError').innerHTML = 
+                        '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                        '<span>Invalid prediction data received</span>' +
+                        '<button class="btn btn-sm btn-outline-danger retry-button ms-2" id="retryPredictionChart">Retry</button>';
+                    
+                    // Add event listener to retry button
+                    document.getElementById('retryPredictionChart').onclick = function() {
+                        updatePredictionChart(currentSymbol, model);
+                    };
+                    
+                    return;
+                }
+                
+                const dates = predictionData.dates;
+                const actualPrices = predictionData.actualPrices;
+                const predictedPrices = predictionData.predictedPrices || [];
+                const futurePredictions = predictionData.futurePredictions || [];
+                
+                // Create actual trace
+                const actualTrace = {
+                    x: dates.slice(0, actualPrices.length),
+                    y: actualPrices,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Actual Price',
+                    line: { color: '#4361ee', width: 2 }
+                };
+                
+                // Create predicted trace - combine test predictions with future predictions
+                const predictedTrace = {
+                    x: dates,
+                    y: [...actualPrices.slice(0, actualPrices.length - predictedPrices.length), ...predictedPrices, ...futurePredictions],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Predicted Price',
+                    line: { color: '#f72585', width: 2, dash: 'dash' }
+                };
+                
+                // Add a vertical line to indicate where predictions start
+                const predictionStartLine = {
+                    type: 'scatter',
+                    mode: 'lines',
+                    x: [dates[actualPrices.length - 1], dates[actualPrices.length - 1]],
+                    y: [Math.min(...actualPrices), Math.max(...actualPrices)],
+                    line: { color: '#4cc9f0', width: 1, dash: 'dot' },
+                    name: 'Prediction Start',
+                    showlegend: false
+                };
+                
+                const data = [actualTrace, predictedTrace, predictionStartLine];
+                
+                const modelNames = {
+                    'lstm': 'LSTM (Long Short-Term Memory)',
+                    'ann': 'ANN (Artificial Neural Network)',
+                    'svm': 'SVM (Support Vector Machine)',
+                    'dt': 'Decision Tree',
+                    'rf': 'Random Forest'
+                };
+                
+                const layout = {
+                    title: {
+                        text: `${currentSymbol} - Price Prediction using ${modelNames[model]}`,
+                        font: { size: 18, family: 'Inter, sans-serif' }
+                    },
+                    xaxis: { 
+                        title: 'Date',
+                        gridcolor: '#e0e0e0'
+                    },
+                    yaxis: { 
+                        title: 'Price (₹)',
+                        gridcolor: '#e0e0e0'
+                    },
+                    legend: { x: 0, y: 1 },
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    margin: { t: 50, r: 30, b: 50, l: 60 },
+                    annotations: [{
+                        x: dates[actualPrices.length - 1],
+                        y: Math.max(...actualPrices) * 0.95,
+                        xref: 'x',
+                        yref: 'y',
+                        text: 'Prediction Start',
+                        showarrow: false,
+                        font: { color: '#4cc9f0' }
+                    }]
+                };
+                
+                const config = {
+                    responsive: true,
+                    displayModeBar: true,
+                    displaylogo: false,
+                    modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d']
+                };
+                
+                Plotly.newPlot(chartContainerId, data, layout, config);
+                
+                // Update model metrics
+                if (predictionData.metrics) {
+                    updateModelMetrics(predictionData.metrics, model);
+                }
+                
+                // Update prediction summary
+                if (futurePredictions.length > 0) {
+                    const lastActualPrice = actualPrices[actualPrices.length - 1];
+                    const lastPredictedPrice = futurePredictions[0];
+                    if (lastActualPrice && lastPredictedPrice) {
+                        updatePredictionSummary(lastActualPrice, lastPredictedPrice, model);
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating prediction chart:', error);
+                document.getElementById('predictionChartError').style.display = 'block';
+                document.getElementById('predictionChartError').innerHTML = 
+                    '<i class="bi bi-exclamation-triangle me-2"></i>' +
+                    '<span>Error: ' + error.message + '</span>' +
+                    '<button class="btn btn-sm btn-outline-danger retry-button ms-2" id="retryPredictionChart">Retry</button>';
+                
+                // Add event listener to retry button
+                document.getElementById('retryPredictionChart').onclick = function() {
+                    updatePredictionChart(document.getElementById('stockSymbol').value.trim(), model);
+                };
+                
+                throw error;
+            }
+        }
+    </script>
+</body>
+</html>
